@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Muestreo ISO">
+<meta name="theme-color" content="#ffffff">
+<title>Muestreo ISO 2859-1</title>
+
+<style>
+  :root {
+    --blue: #185FA5;
+    --blue-bg: #E6F1FB;
+    --blue-border: #B5D4F4;
+    --amber: #854F0B;
+    --amber-bg: #FAEEDA;
+    --amber-border: #FAC775;
+    --red: #A32D2D;
+    --red-bg: #FCEBEB;
+    --red-border: #F7C1C1;
+    --green: #3B6D11;
+    --green-bg: #EAF3DE;
+    --green-border: #C0DD97;
+    --gray: #5F5E5A;
+    --gray-bg: #F1EFE8;
+    --text: #1a1a18;
+    --text2: #5F5E5A;
+    --text3: #888780;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.20);
+    --surface: #ffffff;
+    --surface2: #F7F6F2;
+    --surface3: #F1EFE8;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --blue: #85B7EB; --blue-bg: #042C53; --blue-border: #0C447C;
+      --amber: #EF9F27; --amber-bg: #412402; --amber-border: #633806;
+      --red: #F09595; --red-bg: #501313; --red-border: #791F1F;
+      --green: #97C459; --green-bg: #173404; --green-border: #27500A;
+      --gray: #B4B2A9; --gray-bg: #2C2C2A;
+      --text: #F1EFE8; --text2: #B4B2A9; --text3: #888780;
+      --border: rgba(255,255,255,0.12); --border2: rgba(255,255,255,0.20);
+      --surface: #1c1c1a; --surface2: #242422; --surface3: #2C2C2A;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    background: var(--surface2);
+    color: var(--text);
+    min-height: 100dvh;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: calc(var(--safe-top) + 12px) 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-inner { display: flex; align-items: center; gap: 10px; }
+  .topbar-icon {
+    width: 36px; height: 36px;
+    background: var(--blue-bg);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .topbar h1 { font-size: 17px; font-weight: 600; letter-spacing: -.3px; }
+  .topbar p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .topbar-badge {
+    margin-left: auto;
+    font-size: 11px; font-weight: 500;
+    padding: 4px 10px;
+    background: var(--surface3);
+    border-radius: 20px;
+    color: var(--text2);
+    border: 0.5px solid var(--border);
+  }
+
+  .content { padding: 16px; max-width: 720px; margin: 0 auto; padding-bottom: calc(var(--safe-bottom) + 24px); }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--border);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .step-num {
+    width: 18px; height: 18px;
+    background: var(--text); color: var(--surface);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .field label {
+    font-size: 12px; color: var(--text2);
+    display: block; margin-bottom: 5px; font-weight: 500;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    font-size: 16px;
+    background: var(--surface2);
+    color: var(--text);
+    font-family: inherit;
+    appearance: none; -webkit-appearance: none;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--blue);
+    background: var(--blue-bg);
+  }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888780' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  .metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
+  .metric {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 12px;
+    border: 0.5px solid var(--border);
+  }
+  .metric .lbl { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing:.04em; margin-bottom: 5px; }
+  .metric .val { font-size: 24px; font-weight: 600; letter-spacing: -.5px; line-height: 1; }
+  .metric .sub { font-size: 10px; color: var(--text3); margin-top: 3px; }
+  .metric.highlight { background: var(--blue-bg); border-color: var(--blue-border); }
+  .metric.highlight .val { color: var(--blue); }
+
+  .aql-rows { display: flex; flex-direction: column; gap: 1px; }
+  .aql-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 120px 56px 56px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+  }
+  .aql-row + .aql-row { margin-top: 6px; }
+  .aql-desc { font-size: 12px; color: var(--text2); }
+  .aql-acre { text-align: center; }
+  .aql-acre .num { font-size: 18px; font-weight: 600; }
+  .aql-acre .lbl-small { font-size: 10px; color: var(--text3); }
+
+  .chip {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px; letter-spacing: -.1px;
+  }
+  .chip-red    { background: var(--red-bg);   color: var(--red); }
+  .chip-amber  { background: var(--amber-bg); color: var(--amber); }
+  .chip-blue   { background: var(--blue-bg);  color: var(--blue); }
+  .chip-green  { background: var(--green-bg); color: var(--green); }
+  .chip-gray   { background: var(--gray-bg);  color: var(--gray); }
+
+  .dist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .dist-card {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .dist-card .big { font-size: 32px; font-weight: 700; letter-spacing: -1px; color: var(--text); }
+  .dist-card .small { font-size: 12px; color: var(--text2); }
+
+  .alert {
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 13px;
+    display: flex; gap: 10px; align-items: flex-start;
+    margin-top: 10px; line-height: 1.5;
+  }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert-info  { background: var(--blue-bg);  color: var(--blue);  border: 0.5px solid var(--blue-border); }
+  .alert-warn  { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-border); }
+  .alert-red   { background: var(--red-bg);   color: var(--red);   border: 0.5px solid var(--red-border); }
+
+  .decision-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .decision-table th {
+    font-size: 10px; font-weight: 600; color: var(--text3);
+    text-transform: uppercase; letter-spacing: .05em;
+    padding: 8px 10px; text-align: center;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .decision-table th:first-child { text-align: left; }
+  .decision-table td {
+    padding: 10px; text-align: center;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .decision-table td:first-child { text-align: left; }
+  .decision-table tr:last-child td { border-bottom: none; }
+
+  .install-hint {
+    background: var(--green-bg);
+    border: 0.5px solid var(--green-border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--green);
+    display: flex; gap: 8px; align-items: flex-start;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .install-hint.hidden { display: none; }
+
+  @media (max-width: 480px) {
+    .aql-row { grid-template-columns: 80px 1fr 100px 48px 48px; gap: 6px; padding: 8px 10px; }
+    .metrics { grid-template-columns: repeat(3,1fr); }
+    .metric .val { font-size: 20px; }
+    .aql-acre .num { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-icon">🔍</div>
+    <div>
+      <h1>Muestreo ISO 2859-1</h1>
+      <p>Inspección normal · Nivel II · NCA simple</p>
+    </div>
+    <span class="topbar-badge">v1.0</span>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="install-hint" id="install-hint">
+    <span>📲</span>
+    <span>Toca <strong>Compartir → Agregar a pantalla de inicio</strong> para instalar esta app en tu iPad.</span>
+  </div>
+
+  <!-- PASO 1 -->
+  <div class="card">
+    <div class="section-label">
+      <span class="step-num">1</span>
+      Tamaño del lote
+    </div>
+    <div class="grid3" style="margin-bottom:14px">
+      <div class="field">
+        <label>Cajas</label>
+        <input type="number" inputmode="numeric" id="cajas" min="1" value="40" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Unid. por caja</label>
+        <input type="number" inputmode="numeric" id="uporcaja" min="1" value="500" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Lotes</label>
+        <input type="number" inputmode="numeric" id="lotes" min="1" value="1" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="lbl">Lote total (N)</div>
+        <div class="val" id="m-n">20,000</div>
+        <div class="sub">unidades</div>
+      </div>
+      <div class="metric">
+        <div class="lbl">Letra código</div>
+        <div class="val" id="m-letra">M</div>
+        <div class="sub">Nivel II</div>
+      </div>
+      <div class="metric highlight">
+        <div class="lbl">Muestra (n)</div>
+        <div class="val" id="m-sample">315</div>
+        <div class="sub">piezas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="card">
+    <div class="section-label">
+      <span class="step-num">2</span>
+      AQL por clase de defecto
+    </div>
+    <div class="aql-rows">
+
+      <div class="aql-row" style="background:var(--red-bg); border-color:var(--red-border)">
+        <span class="chip chip-red">Crítico</span>
+        <span class="aql-desc">Hace inutilizable el producto</span>
+        <select onchange="calc()" id="aql-c" style="background:var(--red-bg); border-color:var(--red-border); font-size:13px; padding:7px 28px 7px 8px;">
+          <option value="0">0 — Cero tolerancia</option>
+        </select>
+        <div class="aql-acre">
+          <div class="num" id="ac-c" style="color:var(--red)">0</div>
+          <div class="lbl-small" style="color:var(--red)">Ac</div>
+        </div>
+        <div class="aql-acre">
+          <div class="num" id="re-c" style="color:var(--red)">1</div>
+          <div class="lbl-small" style="color:var(--red)">Re</div>
+        </div>
+      </div>
+
+      <div class="aql-row" style="background:var(--amber-bg); border-color:var(--amber-border)">
+        <span class="chip chip-amber">Mayor</span>
+        <span class="aql-desc">Afecta percepción de calidad</span>
+        <select onchange="calc()" id="aql-m" style="background:var(--amber-bg); border-color:var(--amber-border); font-size:13px; padding:7px 28px 7px 8px;">
+          <option value="0.65">0.65%</option>
+          <option value="1.0">1.0%</option>
+          <option value="1.5">1.5%</option>
+          <option value="2.5" selected>2.5%</option>
+          <option value="4.0">4.0%</option>
+        </select>
+        <div class="aql-acre">
+          <div class="num" id="ac-m" style="color:var(--amber)">—</div>
+          <div class="lbl-small" style="color:var(--amber)">Ac</div>
+        </div>
+        <div class="aql-acre">
+          <div class="num" id="re-m" style="color:var(--amber)">—</div>
+          <div class="lbl-small" style="color:var(--amber)">Re</div>
+        </div>
+      </div>
+
+      <div class="aql-row" style="background:var(--blue-bg); border-color:var(--blue-border)">
+        <span class="chip chip-blue">Menor</span>
+        <span class="aql-desc">Detalle visual menor</span>
+        <select onchange="calc()" id="aql-n" style="background:var(--blue-bg); border-color:var(--blue-border); font-size:13px; padding:7px 28px 7px 8px;">
+          <option value="1.5">1.5%</option>
+          <option value="2.5">2.5%</option>
+          <option value="4.0" selected>4.0%</option>
+          <option value="6.5">6.5%</option>
+        </select>
+        <div class="aql-acre">
+          <div class="num" id="ac-n" style="color:var(--blue)">—</div>
+          <div class="lbl-small" style="color:var(--blue)">Ac</div>
+        </div>
+        <div class="aql-acre">
+          <div class="num" id="re-n" style="color:var(--blue)">—</div>
+          <div class="lbl-small" style="color:var(--blue)">Re</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="card">
+    <div class="section-label">
+      <span class="step-num">3</span>
+      Reparto de muestra
+    </div>
+    <div class="dist-grid">
+      <div class="dist-card">
+        <div class="small">📦 Cajas mínimas a abrir</div>
+        <div class="big" id="cajas-abrir">—</div>
+        <div class="small">de <span id="total-cajas">40</span> cajas totales</div>
+      </div>
+      <div class="dist-card">
+        <div class="small">🔢 Piezas aprox. por caja</div>
+        <div class="big" id="pzas-caja">—</div>
+        <div class="small">al azar en cada caja</div>
+      </div>
+    </div>
+    <div class="alert alert-info">
+      <span class="alert-icon">ℹ️</span>
+      <span>Mete la mano, mezcla y toma piezas al azar. No tomes todas del mismo lugar.</span>
+    </div>
+  </div>
+
+  <!-- PASO 4 -->
+  <div class="card">
+    <div class="section-label">
+      <span class="step-num">4</span>
+      Regla de decisión
+    </div>
+    <table class="decision-table">
+      <thead>
+        <tr>
+          <th>Clase</th>
+          <th>Defectos ≤ Ac</th>
+          <th>Defectos ≥ Re</th>
+          <th>Entre Ac y Re</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="chip chip-red">Crítico</span></td>
+          <td><span class="chip chip-green">✓ Aceptar</span></td>
+          <td><span class="chip chip-red">✗ Rechazar</span></td>
+          <td><span class="chip chip-gray">—</span></td>
+        </tr>
+        <tr>
+          <td><span class="chip chip-amber">Mayor</span></td>
+          <td><span class="chip chip-green">✓ Aceptar</span></td>
+          <td><span class="chip chip-red">✗ Rechazar</span></td>
+          <td><span class="chip chip-gray">Consultar</span></td>
+        </tr>
+        <tr>
+          <td><span class="chip chip-blue">Menor</span></td>
+          <td><span class="chip chip-green">✓ Aceptar</span></td>
+          <td><span class="chip chip-red">✗ Rechazar</span></td>
+          <td><span class="chip chip-gray">Consultar</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="alert alert-red" style="margin-top:10px">
+      <span class="alert-icon">🚨</span>
+      <span><strong>Regla crítica:</strong> un solo defecto crítico rechaza el lote de inmediato, sin importar Mayor o Menor.</span>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+const LOT_CODES = [
+  [2,8,'A'],[9,15,'B'],[16,25,'C'],[26,50,'D'],[51,90,'E'],
+  [91,150,'F'],[151,280,'G'],[281,500,'H'],[501,1200,'J'],
+  [1201,3200,'K'],[3201,10000,'L'],[10001,35000,'M'],
+  [35001,150000,'N'],[150001,500000,'P'],[500001,Infinity,'Q']
+];
+const SAMPLE_SIZE = {A:2,B:3,C:5,D:8,E:13,F:20,G:32,H:50,J:80,K:125,L:200,M:315,N:500,P:800,Q:1250};
+const AQL_TABLE = {
+  A:{0.065:null,0.10:null,0.15:null,0.25:null,0.40:null,0.65:null,1.0:null,1.5:null,2.5:null,4.0:[0,1],6.5:[1,2],10:[1,2]},
+  B:{0.065:null,0.10:null,0.15:null,0.25:null,0.40:null,0.65:null,1.0:null,1.5:null,2.5:null,4.0:[0,1],6.5:[1,2],10:[1,2]},
+  C:{0.065:null,0.10:null,0.15:null,0.25:null,0.40:null,0.65:null,1.0:null,1.5:null,2.5:[0,1],4.0:[1,2],6.5:[1,2],10:[2,3]},
+  D:{0.065:null,0.10:null,0.15:null,0.25:null,0.40:null,0.65:null,1.0:null,1.5:[0,1],2.5:[1,2],4.0:[1,2],6.5:[2,3],10:[3,4]},
+  E:{0.065:null,0.10:null,0.15:null,0.25:null,0.40:null,0.65:null,1.0:[0,1],1.5:[1,2],2.5:[1,2],4.0:[2,3],6.5:[3,4],10:[5,6]},
+  F:{0.065:null,0.10:null,0.15:null,0.25:null,0.40:null,0.65:[0,1],1.0:[1,2],1.5:[1,2],2.5:[2,3],4.0:[3,4],6.5:[5,6],10:[7,8]},
+  G:{0.065:null,0.10:null,0.15:null,0.25:null,0.40:[0,1],0.65:[1,2],1.0:[1,2],1.5:[2,3],2.5:[3,4],4.0:[5,6],6.5:[7,8],10:[10,11]},
+  H:{0.065:null,0.10:null,0.15:null,0.25:[0,1],0.40:[1,2],0.65:[1,2],1.0:[2,3],1.5:[3,4],2.5:[5,6],4.0:[7,8],6.5:[10,11],10:[14,15]},
+  J:{0.065:null,0.10:null,0.15:[0,1],0.25:[1,2],0.40:[1,2],0.65:[2,3],1.0:[3,4],1.5:[5,6],2.5:[7,8],4.0:[10,11],6.5:[14,15],10:[21,22]},
+  K:{0.065:null,0.10:[0,1],0.15:[1,2],0.25:[1,2],0.40:[2,3],0.65:[3,4],1.0:[5,6],1.5:[7,8],2.5:[10,11],4.0:[14,15],6.5:[21,22],10:[21,22]},
+  L:{0.065:[0,1],0.10:[1,2],0.15:[1,2],0.25:[2,3],0.40:[3,4],0.65:[5,6],1.0:[7,8],1.5:[10,11],2.5:[14,15],4.0:[21,22],6.5:[21,22],10:[21,22]},
+  M:{0.065:[1,2],0.10:[1,2],0.15:[2,3],0.25:[3,4],0.40:[5,6],0.65:[7,8],1.0:[10,11],1.5:[14,15],2.5:[21,22],4.0:[21,22],6.5:[21,22],10:[21,22]},
+  N:{0.065:[1,2],0.10:[2,3],0.15:[3,4],0.25:[5,6],0.40:[7,8],0.65:[10,11],1.0:[14,15],1.5:[21,22],2.5:[21,22],4.0:[21,22],6.5:[21,22],10:[21,22]},
+  P:{0.065:[2,3],0.10:[3,4],0.15:[5,6],0.25:[7,8],0.40:[10,11],0.65:[14,15],1.0:[21,22],1.5:[21,22],2.5:[21,22],4.0:[21,22],6.5:[21,22],10:[21,22]},
+  Q:{0.065:[3,4],0.10:[5,6],0.15:[7,8],0.25:[10,11],0.40:[14,15],0.65:[21,22],1.0:[21,22],1.5:[21,22],2.5:[21,22],4.0:[21,22],6.5:[21,22],10:[21,22]}
+};
+
+function getCode(N) {
+  for (const [lo,hi,code] of LOT_CODES) if (N>=lo && N<=hi) return code;
+  return 'Q';
+}
+function lookupAcRe(letter, aql) {
+  if (parseFloat(aql)===0) return [0,1];
+  const row = AQL_TABLE[letter];
+  if (!row) return null;
+  return row[parseFloat(aql)] || null;
+}
+function fmt(n) { return isNaN(n)||n===0 ? '—' : n.toLocaleString('es-MX'); }
+
+function calc() {
+  const cajas    = parseInt(document.getElementById('cajas').value)    || 0;
+  const uporcaja = parseInt(document.getElementById('uporcaja').value) || 0;
+  const lotes    = parseInt(document.getElementById('lotes').value)    || 1;
+  const N = cajas * uporcaja * lotes;
+  const letra = N > 0 ? getCode(N) : '—';
+  const n = N > 0 ? SAMPLE_SIZE[letra] : 0;
+
+  document.getElementById('m-n').textContent      = N > 0 ? N.toLocaleString('es-MX') : '—';
+  document.getElementById('m-letra').textContent  = letra;
+  document.getElementById('m-sample').textContent = n > 0 ? n.toLocaleString('es-MX') : '—';
+  document.getElementById('total-cajas').textContent = cajas || '—';
+
+  [
+    {aqlId:'aql-c', acId:'ac-c', reId:'re-c'},
+    {aqlId:'aql-m', acId:'ac-m', reId:'re-m'},
+    {aqlId:'aql-n', acId:'ac-n', reId:'re-n'}
+  ].forEach(({aqlId,acId,reId}) => {
+    const aqlVal = document.getElementById(aqlId).value;
+    let ac='—', re='—';
+    if (letra !== '—') {
+      const res = lookupAcRe(letra, aqlVal);
+      if (res) { ac = res[0]; re = res[1]; }
+    }
+    document.getElementById(acId).textContent = ac;
+    document.getElementById(reId).textContent = re;
+  });
+
+  if (cajas > 0 && n > 0 && uporcaja > 0) {
+    const cajasAbrir = Math.min(Math.max(1, Math.ceil(n / uporcaja)), cajas);
+    const pzasCaja   = Math.ceil(n / cajasAbrir);
+    document.getElementById('cajas-abrir').textContent = cajasAbrir;
+    document.getElementById('pzas-caja').textContent   = pzasCaja;
+  } else {
+    document.getElementById('cajas-abrir').textContent = '—';
+    document.getElementById('pzas-caja').textContent   = '—';
+  }
+}
+
+// Ocultar hint de instalación si ya está en modo standalone (instalado)
+if (window.navigator.standalone === true) {
+  document.getElementById('install-hint').classList.add('hidden');
+}
+
+// Service Worker para modo offline
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'muestreo-iso-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.add('/')));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      ));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(cached => {
+          if (cached) return cached;
+          return fetch(e.request).then(resp => {
+            const clone = resp.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+            return resp;
+          }).catch(() => cached);
+        })
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+
+calc();
+</script>
+</body>
+</html>
